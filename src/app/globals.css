@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Design tokens
+   All values are HSL components (no `hsl()` wrapper) so Tailwind can compose
+   them with opacity modifiers: bg-primary/80, text-foreground/60, etc.
+───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* ── Neutrals ─────────────────────────────────────── */
+    --background: 0 0% 98%; /* page background  #fafafa  */
+    --foreground: 222 14% 12%; /* body text        #1a1f2e  */
+
+    /* ── Surface layers ──────────────────────────────── */
+    --card: 0 0% 100%; /* card / panel     #ffffff  */
+    --card-foreground: 222 14% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 14% 12%;
+
+    /* ── Brand / Primary ─────────────────────────────── */
+    --primary: 221 83% 53%; /* blue             #2563eb  */
+    --primary-foreground: 0 0% 100%;
+
+    /* ── Secondary ───────────────────────────────────── */
+    --secondary: 220 14% 95%; /* light grey       #f0f2f5  */
+    --secondary-foreground: 222 14% 28%;
+
+    /* ── Muted ───────────────────────────────────────── */
+    --muted: 220 14% 95%;
+    --muted-foreground: 220 9% 46%; /* hint text        #6b7280  */
+
+    /* ── Accent ──────────────────────────────────────── */
+    --accent: 220 14% 92%; /* hover tint       #e8eaf0  */
+    --accent-foreground: 222 14% 12%;
+
+    /* ── Destructive / Error ─────────────────────────── */
+    --destructive: 0 72% 51%; /* red              #dc2626  */
+    --destructive-foreground: 0 0% 100%;
+
+    /* ── Success ─────────────────────────────────────── */
+    --success: 142 71% 45%; /* green            #16a34a  */
+    --success-foreground: 0 0% 100%;
+
+    /* ── Warning ─────────────────────────────────────── */
+    --warning: 38 92% 50%; /* amber            #f59e0b  */
+    --warning-foreground: 0 0% 100%;
+
+    /* ── Form / Input ────────────────────────────────── */
+    --border: 220 13% 88%; /* subtle border    #dde1ea  */
+    --input: 220 13% 88%;
+    --ring: 221 83% 53%; /* focus ring = primary      */
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    --sidebar: 222 18% 14%; /* dark navy        #1c2132  */
+    --sidebar-foreground: 220 14% 90%; /* light text                */
+    --sidebar-border: 222 18% 20%; /* subtle divider            */
+    --sidebar-accent: 222 18% 22%; /* item hover                */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-muted-foreground: 220 9% 56%; /* secondary nav text        */
+
+    /* ── Border radius ───────────────────────────────── */
+    --radius: 0.5rem; /* 8px base                  */
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base resets
+───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply box-border border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    min-height: 100dvh;
+  }
+
+  /* Typography scale */
+  h1 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+  h2 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  h3 {
+    @apply text-xl font-semibold;
+  }
+  h4 {
+    @apply text-lg font-medium;
+  }
+
+  /* Focus — visible only on keyboard nav, not mouse */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Utility classes
+───────────────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* Thin scrollbar for sidebar / overflow panels */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 99px;
+  }
+
+  /* Page section wrapper */
+  .page-header {
+    @apply mb-6 flex items-center justify-between;
+  }
+  .page-title {
+    @apply text-2xl font-semibold tracking-tight text-foreground;
+  }
+  .page-description {
+    @apply mt-1 text-sm text-muted-foreground;
+  }
+}
