@@ -71,7 +71,10 @@ export function DataTable<TData>({
   // ── Prepend checkbox column when enabled ──────────────────────────────────
   const allColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
     if (!enableRowSelection) return columns;
-    return [buildSelectColumn<TData>() as ColumnDef<TData, unknown>, ...columns];
+    return [
+      buildSelectColumn<TData>() as ColumnDef<TData, unknown>,
+      ...columns,
+    ];
   }, [columns, enableRowSelection]);
 
   const table = useReactTable({
@@ -86,7 +89,8 @@ export function DataTable<TData>({
       onSortingChange?.(next);
     },
     onRowSelectionChange: (updater) => {
-      const next = typeof updater === "function" ? updater(rowSelection) : updater;
+      const next =
+        typeof updater === "function" ? updater(rowSelection) : updater;
       setInternalRowSelection(next);
       onRowSelectionChange?.(next);
     },
@@ -99,23 +103,32 @@ export function DataTable<TData>({
       {/* ── Head ────────────────────────────────────────────────────────── */}
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="border-b border-border bg-muted/50">
+          <tr
+            key={headerGroup.id}
+            className="border-border bg-muted/50 border-b"
+          >
             {headerGroup.headers.map((header) => {
               const pinned = header.column.getIsPinned();
               return (
                 <th
                   key={header.id}
                   colSpan={header.colSpan}
-                  style={{ width: header.getSize(), ...getStickyStyle(header.column) }}
+                  style={{
+                    width: header.getSize(),
+                    ...getStickyStyle(header.column),
+                  }}
                   className={cn(
-                    "px-3 py-2.5 text-left text-xs font-medium text-muted-foreground",
+                    "text-muted-foreground px-3 py-2.5 text-left text-xs font-medium",
                     getStickyClass(pinned),
                     "bg-muted/50",
                   )}
                 >
                   {header.isPlaceholder ? null : (
                     <SortableHeader column={header.column}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                     </SortableHeader>
                   )}
                 </th>
@@ -136,8 +149,8 @@ export function DataTable<TData>({
               data-selected={row.getIsSelected()}
               onClick={() => onRowClick?.(row.original)}
               className={cn(
-                "border-b border-border/60 transition-colors last:border-0",
-                onRowClick && "cursor-pointer hover:bg-accent/40",
+                "border-border/60 border-b transition-colors last:border-0",
+                onRowClick && "hover:bg-accent/40 cursor-pointer",
                 row.getIsSelected() && "bg-primary/5",
               )}
             >
@@ -146,8 +159,14 @@ export function DataTable<TData>({
                 return (
                   <td
                     key={cell.id}
-                    style={{ width: cell.column.getSize(), ...getStickyStyle(cell.column) }}
-                    className={cn("px-3 py-2.5 text-sm text-foreground", getStickyClass(pinned))}
+                    style={{
+                      width: cell.column.getSize(),
+                      ...getStickyStyle(cell.column),
+                    }}
+                    className={cn(
+                      "text-foreground px-3 py-2.5 text-sm",
+                      getStickyClass(pinned),
+                    )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>

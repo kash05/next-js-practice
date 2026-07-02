@@ -18,7 +18,12 @@ interface TableCheckboxProps {
   label?: string;
 }
 
-export function TableCheckbox({ checked, indeterminate, onChange, label }: TableCheckboxProps) {
+export function TableCheckbox({
+  checked,
+  indeterminate,
+  onChange,
+  label,
+}: TableCheckboxProps) {
   return (
     <input
       type="checkbox"
@@ -28,7 +33,7 @@ export function TableCheckbox({ checked, indeterminate, onChange, label }: Table
         if (el) el.indeterminate = indeterminate ?? false;
       }}
       onChange={onChange}
-      className="h-4 w-4 cursor-pointer rounded border-border accent-primary"
+      className="border-border accent-primary h-4 w-4 cursor-pointer rounded"
     />
   );
 }
@@ -56,7 +61,7 @@ export function SortableHeader<TData, TValue>({
       onClick={canSort ? column.getToggleSortingHandler() : undefined}
       className={cn(
         "flex items-center gap-1.5 whitespace-nowrap",
-        canSort && "cursor-pointer select-none hover:text-foreground",
+        canSort && "hover:text-foreground cursor-pointer select-none",
         className,
       )}
     >
@@ -97,7 +102,9 @@ export function SortableHeader<TData, TValue>({
  * Returns inline style for a pinned column cell (th or td).
  * TanStack's column.getStart() / getAfter() give us the pixel offset.
  */
-export function getStickyStyle<TData, TValue>(column: Column<TData, TValue>): React.CSSProperties {
+export function getStickyStyle<TData, TValue>(
+  column: Column<TData, TValue>,
+): React.CSSProperties {
   const pinned = column.getIsPinned();
   if (!pinned) return {};
 
@@ -155,7 +162,10 @@ export function buildSelectColumn<TData>() {
 export function TableEmpty({ colSpan }: { colSpan: number }) {
   return (
     <tr>
-      <td colSpan={colSpan} className="h-32 text-center text-sm text-muted-foreground">
+      <td
+        colSpan={colSpan}
+        className="text-muted-foreground h-32 text-center text-sm"
+      >
         No results.
       </td>
     </tr>
@@ -173,7 +183,12 @@ export function TableShell({
   className?: string;
 }) {
   return (
-    <div className={cn("w-full overflow-auto rounded-lg border border-border", className)}>
+    <div
+      className={cn(
+        "border-border w-full overflow-auto rounded-lg border",
+        className,
+      )}
+    >
       <table className="w-full border-collapse text-sm">{children}</table>
     </div>
   );

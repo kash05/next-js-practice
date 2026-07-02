@@ -14,17 +14,39 @@ import {
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { DragDropBoardProps, DropZoneConfig, DropZoneId, FieldItem, encodeDndId } from "./types";
+import {
+  DragDropBoardProps,
+  DropZoneConfig,
+  DropZoneId,
+  FieldItem,
+  encodeDndId,
+} from "./types";
 import { useDragDropBoard } from "./useDragAndDropBoard";
 import { FieldList } from "./FieldList";
 import { DropZone } from "./DropZone";
 import { ZoneItem } from "./DraggableItem";
 
 const DEFAULT_ZONES: DropZoneConfig[] = [
-  { id: "rowMeasures", label: "Row Measures", description: "Numeric values for rows" },
-  { id: "columnMeasures", label: "Column Measures", description: "Numeric values for columns" },
-  { id: "rowHeaders", label: "Row Headers", description: "Dimension labels on rows" },
-  { id: "columnHeaders", label: "Column Headers", description: "Dimension labels on columns" },
+  {
+    id: "rowMeasures",
+    label: "Row Measures",
+    description: "Numeric values for rows",
+  },
+  {
+    id: "columnMeasures",
+    label: "Column Measures",
+    description: "Numeric values for columns",
+  },
+  {
+    id: "rowHeaders",
+    label: "Row Headers",
+    description: "Dimension labels on rows",
+  },
+  {
+    id: "columnHeaders",
+    label: "Column Headers",
+    description: "Dimension labels on columns",
+  },
 ];
 
 const DROP_ZONE_IDS: DropZoneId[] = [
@@ -41,7 +63,9 @@ function isDropZoneId(id: string): id is DropZoneId {
 function customCollisionDetection(args: Parameters<typeof pointerWithin>[0]) {
   const pointerCollisions = pointerWithin(args);
   if (pointerCollisions.length > 0) {
-    const zoneCollision = pointerCollisions.find((c) => isDropZoneId(String(c.id)));
+    const zoneCollision = pointerCollisions.find((c) =>
+      isDropZoneId(String(c.id)),
+    );
     if (zoneCollision) return [zoneCollision];
     return pointerCollisions;
   }
@@ -66,8 +90,12 @@ export function DragDropBoard({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 2 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 100, tolerance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   const handleListItemClick = useCallback(
@@ -95,7 +123,13 @@ export function DragDropBoard({
         )}
       >
         {/* ── Lists column --- */}
-        <div className={cn("flex shrink-0 gap-3", "h-[260px] sm:h-[280px]", "lg:h-full lg:w-1/2")}>
+        <div
+          className={cn(
+            "flex shrink-0 gap-3",
+            "h-[260px] sm:h-[280px]",
+            "lg:h-full lg:w-1/2",
+          )}
+        >
           <FieldList
             label={listALabel}
             sourceType="list-a"
@@ -134,7 +168,9 @@ export function DragDropBoard({
               description={zoneConfig.description}
               items={board.zones[zoneConfig.id]}
               isOver={board.overZoneId === zoneConfig.id}
-              onRemoveItem={(dndId) => board.removeFromZone(dndId, zoneConfig.id)}
+              onRemoveItem={(dndId) =>
+                board.removeFromZone(dndId, zoneConfig.id)
+              }
               onClear={() => board.clearZone(zoneConfig.id)}
             />
           ))}
@@ -143,7 +179,10 @@ export function DragDropBoard({
 
       {/* Drag overlay */}
       <DndKitDragOverlay
-        dropAnimation={{ duration: 160, easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)" }}
+        dropAnimation={{
+          duration: 160,
+          easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        }}
         style={{ zIndex: 9999 }}
       >
         {board.activeField ? (

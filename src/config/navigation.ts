@@ -27,7 +27,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "ShoppingCart",
     permission: PERMISSIONS.ORDERS_VIEW,
     children: [
-      { label: "All orders", href: "/orders", icon: "List", permission: PERMISSIONS.ORDERS_VIEW },
+      {
+        label: "All orders",
+        href: "/orders",
+        icon: "List",
+        permission: PERMISSIONS.ORDERS_VIEW,
+      },
       {
         label: "Pending",
         href: "/orders/pending",

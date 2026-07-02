@@ -58,15 +58,17 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
       }
     : msalAuth;
 
+  const rolesKey = (auth.user?.roles ?? []).join(",");
   const permissions = useMemo(
     () => resolvePermissions(auth.user?.roles ?? []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [auth.user?.roles?.join(",")],
+    [rolesKey],
   );
 
   const can = (permission: Permission): boolean => permissions.has(permission);
-  const canAll = (...perms: Permission[]): boolean => perms.every((p) => permissions.has(p));
-  const canAny = (...perms: Permission[]): boolean => perms.some((p) => permissions.has(p));
+  const canAll = (...perms: Permission[]): boolean =>
+    perms.every((p) => permissions.has(p));
+  const canAny = (...perms: Permission[]): boolean =>
+    perms.some((p) => permissions.has(p));
 
   return (
     <AuthContext.Provider value={{ ...auth, permissions, can, canAll, canAny }}>
@@ -77,6 +79,7 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
 export function useAuthContext(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuthContext must be used inside <AuthContextProvider>");
+  if (!ctx)
+    throw new Error("useAuthContext must be used inside <AuthContextProvider>");
   return ctx;
 }

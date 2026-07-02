@@ -1,9 +1,20 @@
 "use client";
 
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
-import { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from "@dnd-kit/core";
+import {
+  DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  UniqueIdentifier,
+} from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { BoardState, DropZoneId, FieldItem, encodeDndId, decodeDndId } from "./types";
+import {
+  BoardState,
+  DropZoneId,
+  FieldItem,
+  encodeDndId,
+  decodeDndId,
+} from "./types";
 
 const DROP_ZONE_IDS: DropZoneId[] = [
   "rowMeasures",
@@ -40,7 +51,10 @@ interface UseDragDropBoardOptions {
   onChange?: (state: BoardState) => void;
 }
 
-export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOptions) {
+export function useDragDropBoard({
+  initialState,
+  onChange,
+}: UseDragDropBoardOptions) {
   const [zones, setZones] = useState<ZoneMap>(() => {
     const init: ZoneMap = {
       rowMeasures: [],
@@ -74,7 +88,8 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
   // ── usedFieldIds — which fields are already in any zone ───────────────────
   const usedFieldIds = useMemo<Set<string>>(() => {
     const s = new Set<string>();
-    for (const zoneId of DROP_ZONE_IDS) zones[zoneId].forEach((i) => s.add(i.id));
+    for (const zoneId of DROP_ZONE_IDS)
+      zones[zoneId].forEach((i) => s.add(i.id));
     return s;
   }, [zones]);
 
@@ -101,7 +116,10 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
   }, []);
 
   // ── Field resolution helpers ───────────────────────────────────────────────
-  function resolveField(dndId: UniqueIdentifier, currentZones: ZoneMap): FieldItem | null {
+  function resolveField(
+    dndId: UniqueIdentifier,
+    currentZones: ZoneMap,
+  ): FieldItem | null {
     const decoded = decodeDndId(String(dndId));
     if (!decoded) return null;
     if (decoded.sourceType === "list-a")
@@ -115,7 +133,10 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
     return null;
   }
 
-  function findItemZone(dndId: string, currentZones: ZoneMap): DropZoneId | null {
+  function findItemZone(
+    dndId: string,
+    currentZones: ZoneMap,
+  ): DropZoneId | null {
     for (const zoneId of DROP_ZONE_IDS) {
       if (currentZones[zoneId].some((z) => z.dndId === dndId)) return zoneId;
     }
@@ -175,11 +196,19 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
       };
 
       // ── List → zone ────────────────────────────────────────────────────
-      if (activeParsed.sourceType === "list-a" || activeParsed.sourceType === "list-b") {
-        const list = activeParsed.sourceType === "list-a" ? listARef.current : listBRef.current;
+      if (
+        activeParsed.sourceType === "list-a" ||
+        activeParsed.sourceType === "list-b"
+      ) {
+        const list =
+          activeParsed.sourceType === "list-a"
+            ? listARef.current
+            : listBRef.current;
         const field = list.find((f) => f.id === activeParsed.fieldId);
         if (!field) return prev;
-        const alreadyUsed = DROP_ZONE_IDS.some((z) => next[z].some((i) => i.id === field.id));
+        const alreadyUsed = DROP_ZONE_IDS.some((z) =>
+          next[z].some((i) => i.id === field.id),
+        );
         if (alreadyUsed) return prev;
 
         const newItem = makeZoneItem(field, targetZone);
@@ -210,7 +239,8 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
           const overParsed = decodeDndId(overId);
           if (overParsed?.zoneId === targetZone) {
             const overIndex = sourceItems.findIndex((z) => z.dndId === overId);
-            if (overIndex !== -1) next[sourceZone] = arrayMove(sourceItems, activeIndex, overIndex);
+            if (overIndex !== -1)
+              next[sourceZone] = arrayMove(sourceItems, activeIndex, overIndex);
           }
         } else {
           // Move to different zone
@@ -252,9 +282,14 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
   const addToZone = useCallback(
     (field: FieldItem, zoneId: DropZoneId) => {
       setZones((prev) => {
-        const alreadyUsed = DROP_ZONE_IDS.some((z) => prev[z].some((i) => i.id === field.id));
+        const alreadyUsed = DROP_ZONE_IDS.some((z) =>
+          prev[z].some((i) => i.id === field.id),
+        );
         if (alreadyUsed) return prev;
-        const next = { ...prev, [zoneId]: [...prev[zoneId], makeZoneItem(field, zoneId)] };
+        const next = {
+          ...prev,
+          [zoneId]: [...prev[zoneId], makeZoneItem(field, zoneId)],
+        };
         scheduleEmit(next);
         return next;
       });
@@ -265,7 +300,10 @@ export function useDragDropBoard({ initialState, onChange }: UseDragDropBoardOpt
   const removeFromZone = useCallback(
     (dndId: string, zoneId: DropZoneId) => {
       setZones((prev) => {
-        const next = { ...prev, [zoneId]: prev[zoneId].filter((z) => z.dndId !== dndId) };
+        const next = {
+          ...prev,
+          [zoneId]: prev[zoneId].filter((z) => z.dndId !== dndId),
+        };
         scheduleEmit(next);
         return next;
       });

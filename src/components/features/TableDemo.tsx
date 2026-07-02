@@ -1,7 +1,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable, GroupedColumnTable, GroupedRowTable } from "../common/table";
+import {
+  DataTable,
+  GroupedColumnTable,
+  GroupedRowTable,
+} from "../common/table";
 
 // ─── Shared sample data ────────────────────────────────────────────────────────
 
@@ -137,7 +141,9 @@ const BASE_COLUMNS: ColumnDef<Order, unknown>[] = [
     accessorKey: "status",
     header: "Status",
     size: 110,
-    cell: ({ getValue }) => <StatusBadge status={getValue() as Order["status"]} />,
+    cell: ({ getValue }) => (
+      <StatusBadge status={getValue() as Order["status"]} />
+    ),
   },
   {
     id: "amount",
@@ -203,7 +209,9 @@ const REVENUE_COLUMNS: ColumnDef<Order, unknown>[] = [
     accessorKey: "amount",
     header: "Total",
     size: 100,
-    cell: ({ getValue }) => <strong>${(getValue() as number).toLocaleString()}</strong>,
+    cell: ({ getValue }) => (
+      <strong>${(getValue() as number).toLocaleString()}</strong>
+    ),
   },
 ];
 
@@ -216,7 +224,7 @@ export function TablesDemo() {
       <section className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold">1 — Simple Table</h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Sorting, multi-select checkboxes, sticky first column.
           </p>
         </div>
@@ -233,14 +241,16 @@ export function TablesDemo() {
       <section className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold">2 — Grouped Row Table</h2>
-          <p className="text-sm text-muted-foreground">
-            Rows grouped by quarter. Label cell spans all rows in the group. Group-level checkbox
-            selects all rows in the group.
+          <p className="text-muted-foreground text-sm">
+            Rows grouped by quarter. Label cell spans all rows in the group.
+            Group-level checkbox selects all rows in the group.
           </p>
         </div>
         <GroupedRowTable
           data={DATA as unknown as Record<string, unknown>[]}
-          columns={BASE_COLUMNS as ColumnDef<Record<string, unknown>, unknown>[]}
+          columns={
+            BASE_COLUMNS as ColumnDef<Record<string, unknown>, unknown>[]
+          }
           groupByKey="quarter"
           getGroupLabel={(val) => `${String(val)} 2024`}
           enableSorting
@@ -253,9 +263,10 @@ export function TablesDemo() {
       <section className="space-y-3">
         <div>
           <h2 className="text-lg font-semibold">3 — Grouped Column Table</h2>
-          <p className="text-sm text-muted-foreground">
-            Jan–Mar grouped under &quot;Q1 Revenue&quot;, Apr–Jun under &quot;Q2 Revenue&quot;.
-            Client and Total are standalone (span both header rows).
+          <p className="text-muted-foreground text-sm">
+            Jan–Mar grouped under &quot;Q1 Revenue&quot;, Apr–Jun under &quot;Q2
+            Revenue&quot;. Client and Total are standalone (span both header
+            rows).
           </p>
         </div>
         <GroupedColumnTable

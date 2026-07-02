@@ -62,7 +62,8 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
   className,
 }: GroupedRowTableProps<TData>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
-  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({});
+  const [internalRowSelection, setInternalRowSelection] =
+    useState<RowSelectionState>({});
 
   const sorting = internalSorting;
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -78,7 +79,10 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
     return Array.from(map.entries()).map(([key, rows]) => ({
       key,
       label: getGroupLabel
-        ? getGroupLabel(rows[0][groupByKey as string] as TData[keyof TData], rows)
+        ? getGroupLabel(
+            rows[0][groupByKey as string] as TData[keyof TData],
+            rows,
+          )
         : key,
       rows,
     }));
@@ -94,7 +98,10 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
   // ── Columns ────────────────────────────────────────────────────────────────
   const allColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
     if (!enableRowSelection) return columns;
-    return [buildSelectColumn<TData>() as ColumnDef<TData, unknown>, ...columns];
+    return [
+      buildSelectColumn<TData>() as ColumnDef<TData, unknown>,
+      ...columns,
+    ];
   }, [columns, enableRowSelection]);
 
   // TanStack manages the flat row list for column/sort/selection logic.
@@ -110,7 +117,8 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
       onSortingChange?.(next);
     },
     onRowSelectionChange: (updater) => {
-      const next = typeof updater === "function" ? updater(rowSelection) : updater;
+      const next =
+        typeof updater === "function" ? updater(rowSelection) : updater;
       setInternalRowSelection(next);
       onRowSelectionChange?.(next);
     },
@@ -125,20 +133,24 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
       typeof table.getRowModel.prototype extends () => infer R ? R : never
     >();
     // WeakMap keyed by object reference — works because TData extends object
-    table.getRowModel().rows.forEach((r) => map.set(r.original as object, r as never));
+    table
+      .getRowModel()
+      .rows.forEach((r) => map.set(r.original as object, r as never));
     return map;
   }, [table]);
 
   // Group-level selection helpers
   function isGroupSelected(rows: TData[]) {
     return rows.every((r) => {
-      const row = rowByOriginal.get(r as object) as { getIsSelected?: () => boolean } | undefined;
+      const row = rowByOriginal.get(r as object) as
+        { getIsSelected?: () => boolean } | undefined;
       return row?.getIsSelected?.() ?? false;
     });
   }
   function isGroupIndeterminate(rows: TData[]) {
     const selected = rows.filter((r) => {
-      const row = rowByOriginal.get(r as object) as { getIsSelected?: () => boolean } | undefined;
+      const row = rowByOriginal.get(r as object) as
+        { getIsSelected?: () => boolean } | undefined;
       return row?.getIsSelected?.() ?? false;
     });
     return selected.length > 0 && selected.length < rows.length;
@@ -146,7 +158,10 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
   function toggleGroup(rows: TData[], select: boolean) {
     rows.forEach((r) => {
       const row = rowByOriginal.get(r as object) as
-        | { getIsSelected?: () => boolean; toggleSelected?: (val: boolean) => void }
+        | {
+            getIsSelected?: () => boolean;
+            toggleSelected?: (val: boolean) => void;
+          }
         | undefined;
       row?.toggleSelected?.(select);
     });
@@ -157,27 +172,36 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
       {/* ── Head ────────────────────────────────────────────────────────── */}
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="border-b border-border bg-muted/50">
+          <tr
+            key={headerGroup.id}
+            className="border-border bg-muted/50 border-b"
+          >
             {/* Extra th for the group label column */}
             <th
               style={{ width: groupLabelWidth, minWidth: groupLabelWidth }}
-              className="bg-muted/50 px-3 py-2.5 text-left text-xs font-medium text-muted-foreground"
+              className="bg-muted/50 text-muted-foreground px-3 py-2.5 text-left text-xs font-medium"
             />
             {headerGroup.headers.map((header) => {
               const pinned = header.column.getIsPinned();
               return (
                 <th
                   key={header.id}
-                  style={{ width: header.getSize(), ...getStickyStyle(header.column) }}
+                  style={{
+                    width: header.getSize(),
+                    ...getStickyStyle(header.column),
+                  }}
                   className={cn(
-                    "px-3 py-2.5 text-left text-xs font-medium text-muted-foreground",
+                    "text-muted-foreground px-3 py-2.5 text-left text-xs font-medium",
                     "bg-muted/50",
                     getStickyClass(pinned),
                   )}
                 >
                   {header.isPlaceholder ? null : (
                     <SortableHeader column={header.column}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                     </SortableHeader>
                   )}
                 </th>
@@ -200,7 +224,9 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
                     getIsSelected: () => boolean;
                     getVisibleCells: () => {
                       id: string;
-                      column: ReturnType<typeof table.getVisibleLeafColumns>[number];
+                      column: ReturnType<
+                        typeof table.getVisibleLeafColumns
+                      >[number];
                       getContext: () => any;
                     }[];
                   }
@@ -215,9 +241,9 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
                   data-selected={row.getIsSelected()}
                   onClick={() => onRowClick?.(rowData)}
                   className={cn(
-                    "border-b border-border/60 transition-colors last:border-0",
-                    groupIndex > 0 && isFirst && "border-t-2 border-t-border",
-                    onRowClick && "cursor-pointer hover:bg-accent/40",
+                    "border-border/60 border-b transition-colors last:border-0",
+                    groupIndex > 0 && isFirst && "border-t-border border-t-2",
+                    onRowClick && "hover:bg-accent/40 cursor-pointer",
                     row.getIsSelected() && "bg-primary/5",
                   )}
                 >
@@ -225,8 +251,11 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
                   {isFirst && (
                     <td
                       rowSpan={group.rows.length}
-                      style={{ width: groupLabelWidth, minWidth: groupLabelWidth }}
-                      className="border-r-2 border-primary bg-primary/5 px-3 align-middle"
+                      style={{
+                        width: groupLabelWidth,
+                        minWidth: groupLabelWidth,
+                      }}
+                      className="border-primary bg-primary/5 border-r-2 px-3 align-middle"
                     >
                       {renderGroupLabel ? (
                         renderGroupLabel(group)
@@ -237,15 +266,18 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
                             <TableCheckbox
                               checked={isGroupSelected(group.rows)}
                               indeterminate={isGroupIndeterminate(group.rows)}
-                              onChange={(e) => toggleGroup(group.rows, e.target.checked)}
+                              onChange={(e) =>
+                                toggleGroup(group.rows, e.target.checked)
+                              }
                               label={`Select group ${group.label}`}
                             />
                           )}
-                          <span className="text-center text-xs font-medium leading-tight text-primary">
+                          <span className="text-primary text-center text-xs leading-tight font-medium">
                             {group.label}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {group.rows.length} {group.rows.length === 1 ? "row" : "rows"}
+                          <span className="text-muted-foreground text-[10px]">
+                            {group.rows.length}{" "}
+                            {group.rows.length === 1 ? "row" : "rows"}
                           </span>
                         </div>
                       )}
@@ -258,13 +290,19 @@ export function GroupedRowTable<TData extends Record<string, unknown>>({
                     return (
                       <td
                         key={cell.id}
-                        style={{ width: cell.column.getSize(), ...getStickyStyle(cell.column) }}
+                        style={{
+                          width: cell.column.getSize(),
+                          ...getStickyStyle(cell.column),
+                        }}
                         className={cn(
-                          "px-3 py-2.5 text-sm text-foreground",
+                          "text-foreground px-3 py-2.5 text-sm",
                           getStickyClass(pinned),
                         )}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </td>
                     );
                   })}

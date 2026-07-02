@@ -9,7 +9,8 @@ export interface FieldItem {
 }
 
 /** The four report axis zones */
-export type DropZoneId = "rowMeasures" | "columnMeasures" | "rowHeaders" | "columnHeaders";
+export type DropZoneId =
+  "rowMeasures" | "columnMeasures" | "rowHeaders" | "columnHeaders";
 
 /** Snapshot of all four drop zones — this is what gets sent to the API */
 export interface BoardState {

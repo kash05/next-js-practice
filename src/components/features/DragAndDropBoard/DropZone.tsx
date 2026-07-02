@@ -1,7 +1,10 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { cn } from "@/lib/utils";
 import { DropZoneId } from "./types";
 import { ZoneItem as ZoneItemType } from "./useDragAndDropBoard";
@@ -89,17 +92,19 @@ export function DropZone({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex h-full flex-col overflow-hidden rounded-xl border-2 bg-card shadow-sm",
+        "bg-card flex h-full flex-col overflow-hidden rounded-xl border-2 shadow-sm",
         "transition-all duration-200",
-        isEmpty && !isOver && "border-dashed border-border/60",
+        isEmpty && !isOver && "border-border/60 border-dashed",
         !isEmpty && !isOver && "border-border",
-        isOver && "border-primary/70 bg-primary/5 shadow-md shadow-primary/10",
+        isOver && "border-primary/70 bg-primary/5 shadow-primary/10 shadow-md",
       )}
     >
       <div
         className={cn(
           "flex shrink-0 items-center justify-between border-b px-3 py-2 transition-colors duration-200",
-          isOver ? "border-primary/20 bg-primary/10" : "border-border/60 bg-muted/40",
+          isOver
+            ? "border-primary/20 bg-primary/10"
+            : "border-border/60 bg-muted/40",
         )}
       >
         <div className="flex min-w-0 items-center gap-2">
@@ -114,14 +119,14 @@ export function DropZone({
           <div className="min-w-0">
             <p
               className={cn(
-                "truncate text-xs font-semibold leading-tight transition-colors duration-200",
+                "truncate text-xs leading-tight font-semibold transition-colors duration-200",
                 isOver ? "text-primary" : "text-foreground",
               )}
             >
               {label}
             </p>
             {description && (
-              <p className="mt-0.5 truncate text-[10px] leading-none text-muted-foreground/60">
+              <p className="text-muted-foreground/60 mt-0.5 truncate text-[10px] leading-none">
                 {description}
               </p>
             )}
@@ -130,7 +135,7 @@ export function DropZone({
 
         <div className="ml-2 flex shrink-0 items-center gap-1.5">
           {!isEmpty && (
-            <span className="bg-primary/12 rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+            <span className="bg-primary/12 text-primary rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
               {items.length}
             </span>
           )}
@@ -138,7 +143,7 @@ export function DropZone({
             <button
               type="button"
               onClick={onClear}
-              className="rounded p-0.5 text-muted-foreground/40 transition-colors hover:bg-destructive/10 hover:text-destructive"
+              className="text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive rounded p-0.5 transition-colors"
               title="Clear all"
             >
               <svg
@@ -156,8 +161,11 @@ export function DropZone({
         </div>
       </div>
 
-      <SortableContext items={items.map((i) => i.dndId)} strategy={verticalListSortingStrategy}>
-        <div className="scrollbar-thin flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-2">
+      <SortableContext
+        items={items.map((i) => i.dndId)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="flex min-h-0 flex-1 scrollbar-thin flex-col gap-1.5 overflow-y-auto p-2">
           {isEmpty ? (
             <div className="flex flex-1 items-center justify-center">
               <div className="flex flex-col items-center gap-1.5 text-center">
@@ -171,7 +179,11 @@ export function DropZone({
                   stroke="currentColor"
                   strokeWidth={1.2}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 4v12M4 10h12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10 4v12M4 10h12"
+                  />
                 </svg>
                 <p
                   className={cn(

@@ -5,7 +5,10 @@ import { NAV_ITEMS, NavItem } from "@/config/navigation";
 import { usePermission } from "@/lib/auth/usePermission";
 import { Permission } from "@/config/permissions";
 
-function filterItems(items: NavItem[], can: (p: Permission) => boolean): NavItem[] {
+function filterItems(
+  items: NavItem[],
+  can: (p: Permission) => boolean,
+): NavItem[] {
   return items
     .filter((item) => !item.permission || can(item.permission))
     .map((item) => ({

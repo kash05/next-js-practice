@@ -91,7 +91,8 @@ export function useAuth() {
   }
 
   async function getAccessToken(): Promise<string> {
-    if (!account) throw new Error("No active account — user is not authenticated");
+    if (!account)
+      throw new Error("No active account — user is not authenticated");
 
     try {
       const result = await instance.acquireTokenSilent({

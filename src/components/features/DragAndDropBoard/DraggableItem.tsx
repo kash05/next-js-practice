@@ -17,10 +17,11 @@ interface SourceItemProps {
 }
 
 export function SourceItem({ field, dndId, onClick, isUsed }: SourceItemProps) {
-  const { attributes, listeners, setNodeRef, isDragging, transform } = useDraggable({
-    id: dndId,
-    disabled: isUsed,
-  });
+  const { attributes, listeners, setNodeRef, isDragging, transform } =
+    useDraggable({
+      id: dndId,
+      disabled: isUsed,
+    });
 
   const style: React.CSSProperties = {
     transform: transform ? `translate3d(0px, ${transform.y}px, 0)` : undefined,
@@ -37,14 +38,14 @@ export function SourceItem({ field, dndId, onClick, isUsed }: SourceItemProps) {
       {...listeners}
       {...attributes}
       className={cn(
-        "group flex shrink-0 select-none items-center gap-2 rounded-lg border px-2.5 py-2 text-sm",
+        "group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 text-sm select-none",
         "transition-colors duration-100",
         isUsed
-          ? "cursor-not-allowed border-border/30 bg-muted/20 text-muted-foreground/40"
+          ? "border-border/30 bg-muted/20 text-muted-foreground/40 cursor-not-allowed"
           : [
-              "cursor-grab border-border bg-card text-foreground",
+              "border-border bg-card text-foreground cursor-grab",
               "hover:border-primary/40 hover:bg-primary/5",
-              isDragging && "shadow-sm ring-1 ring-primary/20",
+              isDragging && "ring-primary/20 shadow-sm ring-1",
             ],
       )}
       onClick={() => !isUsed && onClick?.()}
@@ -59,27 +60,36 @@ export function SourceItem({ field, dndId, onClick, isUsed }: SourceItemProps) {
         {[0, 1].map((r) => (
           <span key={r} className="flex gap-[3px]">
             {[0, 1].map((c) => (
-              <span key={c} className="h-[3px] w-[3px] rounded-full bg-current" />
+              <span
+                key={c}
+                className="h-[3px] w-[3px] rounded-full bg-current"
+              />
             ))}
           </span>
         ))}
       </span>
 
-      <span className="flex-1 truncate text-xs leading-snug">{field.label}</span>
+      <span className="flex-1 truncate text-xs leading-snug">
+        {field.label}
+      </span>
 
       {isUsed ? (
-        <span className="shrink-0 rounded bg-muted px-1 py-0.5 text-[9px] font-medium uppercase tracking-wide text-muted-foreground/50">
+        <span className="bg-muted text-muted-foreground/50 shrink-0 rounded px-1 py-0.5 text-[9px] font-medium tracking-wide uppercase">
           added
         </span>
       ) : (
         <svg
-          className="h-3 w-3 shrink-0 text-muted-foreground/30 transition-colors group-hover:text-primary/40"
+          className="text-muted-foreground/30 group-hover:text-primary/40 h-3 w-3 shrink-0 transition-colors"
           viewBox="0 0 16 16"
           fill="none"
           stroke="currentColor"
           strokeWidth={1.5}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8h10M9 4l4 4-4 4" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3 8h10M9 4l4 4-4 4"
+          />
         </svg>
       )}
     </div>
@@ -97,7 +107,14 @@ interface ZoneItemProps {
 }
 
 export function ZoneItem({ field, dndId, onRemove, isOverlay }: ZoneItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: dndId,
   });
 
@@ -112,10 +129,10 @@ export function ZoneItem({ field, dndId, onRemove, isOverlay }: ZoneItemProps) {
       ref={isOverlay ? undefined : setNodeRef}
       style={isOverlay ? undefined : style}
       className={cn(
-        "group flex w-full shrink-0 select-none items-center rounded-lg border",
+        "group flex w-full shrink-0 items-center rounded-lg border select-none",
         "transition-colors duration-100",
         isOverlay
-          ? "rotate-[0.8deg] scale-[1.03] cursor-grabbing border-primary bg-primary text-primary-foreground shadow-2xl"
+          ? "border-primary bg-primary text-primary-foreground scale-[1.03] rotate-[0.8deg] cursor-grabbing shadow-2xl"
           : [
               "bg-primary/8 border-primary/25 text-primary",
               "hover:bg-primary/14 hover:border-primary/45",
@@ -148,7 +165,7 @@ export function ZoneItem({ field, dndId, onRemove, isOverlay }: ZoneItemProps) {
             </span>
           ))}
         </span>
-        <span className="min-w-0 flex-1 truncate text-xs font-medium leading-snug">
+        <span className="min-w-0 flex-1 truncate text-xs leading-snug font-medium">
           {field.label}
         </span>
       </div>
@@ -164,8 +181,8 @@ export function ZoneItem({ field, dndId, onRemove, isOverlay }: ZoneItemProps) {
           }}
           className={cn(
             "flex h-full shrink-0 items-center justify-center px-2.5",
-            "border-l border-primary/15 text-primary/35",
-            "transition-colors hover:bg-destructive/10 hover:text-destructive",
+            "border-primary/15 text-primary/35 border-l",
+            "hover:bg-destructive/10 hover:text-destructive transition-colors",
             "opacity-100 md:opacity-0 md:group-hover:opacity-100",
           )}
           aria-label={`Remove ${field.label}`}

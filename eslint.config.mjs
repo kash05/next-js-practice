@@ -1,59 +1,84 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import reactPlugin from "eslint-plugin-react";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
+import nextPlugin from "@next/eslint-plugin-next";
+import prettierConfig from "eslint-config-prettier";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({ baseDirectory: __dirname });
-
-const config = [
+export default tseslint.config(
   {
-    // Must be its own object — cannot be merged with rules
     ignores: [".next/**", "node_modules/**", "dist/**", "*.config.js"],
   },
 
-  // Next.js core rules (React, React Hooks, Next.js specific)
-  ...compat.extends("next/core-web-vitals"),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
 
-  // TypeScript rules
-  ...compat.extends("plugin:@typescript-eslint/recommended"),
+  {
+    plugins: {
+      react: reactPlugin,
+      "react-hooks": reactHooksPlugin,
+    },
+    settings: {
+      react: { version: "detect" },
+    },
+    rules: {
+      ...reactPlugin.configs.recommended.rules,
+      ...reactHooksPlugin.configs.recommended.rules,
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+      "react-hooks/incompatible-library": "off",
+    },
+  },
 
-  // Prettier — disables ESLint rules that conflict with formatting (always last)
-  ...compat.extends("prettier"),
+  {
+    plugins: {
+      "@next/next": nextPlugin,
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+    },
+  },
 
   {
     rules: {
-      // ── TypeScript ────────────────────────────────────────────────────────
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-non-null-assertion": "warn",
-      // Note: consistent-type-imports omitted — conflicts with Next.js auto-imports
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/no-require-imports": "error",
 
-      // ── React ──────────────────────────────────────────────────────────────
-      "react/self-closing-comp": "error",
-      "react/jsx-curly-brace-presence": ["error", { props: "never", children: "never" }],
+      "react/self-closing-comp": "warn",
+      "react/jsx-curly-brace-presence": [
+        "warn",
+        { props: "never", children: "never" },
+      ],
+      "react/no-array-index-key": "warn",
+      "react/no-danger": "warn",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
 
-      // ── General ────────────────────────────────────────────────────────────
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "prefer-const": "error",
       "no-var": "error",
-      "object-shorthand": "error",
       "no-duplicate-imports": "error",
+      "object-shorthand": "warn",
+      "no-debugger": "error",
+      "no-alert": "warn",
+      eqeqeq: ["warn", "always", { null: "ignore" }],
     },
   },
 
   {
-    // Relax rules in config files
-    files: ["**/*.config.ts", "**/*.config.mjs"],
+    files: ["**/*.config.ts", "**/*.config.mjs", "**/*.config.js"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "no-console": "off",
     },
   },
-];
 
-export default config;
+  prettierConfig,
+);

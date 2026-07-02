@@ -13,25 +13,29 @@ export default function OrdersPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Orders</h1>
-            <p className="text-sm text-muted-foreground">Manage and track all orders.</p>
+            <p className="text-muted-foreground text-sm">
+              Manage and track all orders.
+            </p>
           </div>
 
           <PermissionGate requires={PERMISSIONS.ORDERS_CREATE}>
-            <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium">
               New order
             </button>
           </PermissionGate>
         </div>
 
         {/* Orders table goes here */}
-        <div className="rounded-lg border border-border bg-card p-6">
+        <div className="border-border bg-card rounded-lg border p-6">
           <TablesDemo />
         </div>
 
-        <PermissionGate requiresAny={[PERMISSIONS.ORDERS_APPROVE, PERMISSIONS.ORDERS_DELETE]}>
-          <div className="rounded-lg border border-border bg-card p-6">
+        <PermissionGate
+          requiresAny={[PERMISSIONS.ORDERS_APPROVE, PERMISSIONS.ORDERS_DELETE]}
+        >
+          <div className="border-border bg-card rounded-lg border p-6">
             <p className="text-sm font-medium">Pending approvals</p>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               Wire up pending approvals panel here.
             </p>
           </div>
@@ -40,10 +44,12 @@ export default function OrdersPage() {
         <PermissionGate
           requires={PERMISSIONS.ORDERS_EXPORT}
           fallback={
-            <p className="text-sm text-muted-foreground">Export is not available for your role.</p>
+            <p className="text-muted-foreground text-sm">
+              Export is not available for your role.
+            </p>
           }
         >
-          <button className="rounded-md border border-border px-4 py-2 text-sm hover:bg-accent">
+          <button className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm">
             Export CSV
           </button>
         </PermissionGate>

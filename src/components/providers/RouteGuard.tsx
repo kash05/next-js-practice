@@ -40,15 +40,17 @@ export function RouteGuard({ requires, children }: RouteGuardProps) {
   // Still hydrating — render nothing rather than flashing the denied screen
   if (isLoading) return null;
 
-  const hasAccess = Array.isArray(requires) ? canAll(...requires) : can(requires);
+  const hasAccess = Array.isArray(requires)
+    ? canAll(...requires)
+    : can(requires);
 
   if (!hasAccess) {
     return (
       <div className="flex h-full min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-center">
         {/* Icon */}
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-destructive/10">
+        <div className="bg-destructive/10 flex h-20 w-20 items-center justify-center rounded-full">
           <svg
-            className="h-10 w-10 text-destructive"
+            className="text-destructive h-10 w-10"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -65,18 +67,19 @@ export function RouteGuard({ requires, children }: RouteGuardProps) {
 
         {/* Message */}
         <div className="max-w-sm space-y-2">
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-foreground text-xl font-semibold">
             You don&apos;t have access to this page
           </h2>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Your current role doesn&apos;t include permission to view this content. Contact your
-            administrator if you believe this is a mistake.
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Your current role doesn&apos;t include permission to view this
+            content. Contact your administrator if you believe this is a
+            mistake.
           </p>
         </div>
 
         {/* Role hint — only shown in development */}
         {process.env.NODE_ENV === "development" && (
-          <p className="rounded-md bg-muted px-3 py-1.5 font-mono text-xs text-muted-foreground">
+          <p className="bg-muted text-muted-foreground rounded-md px-3 py-1.5 font-mono text-xs">
             Required: {Array.isArray(requires) ? requires.join(", ") : requires}
           </p>
         )}

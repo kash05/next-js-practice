@@ -57,13 +57,21 @@ export function DragAndDropBoard() {
         listBLoading={dimensions.isLoading}
         onChange={setBoardState}
         zones={[
-          { id: "rowMeasures", label: "Row Measures", description: "Numeric values for rows" },
+          {
+            id: "rowMeasures",
+            label: "Row Measures",
+            description: "Numeric values for rows",
+          },
           {
             id: "columnMeasures",
             label: "Column Measures",
             description: "Numeric values for columns",
           },
-          { id: "rowHeaders", label: "Row Headers", description: "Dimension labels on rows" },
+          {
+            id: "rowHeaders",
+            label: "Row Headers",
+            description: "Dimension labels on rows",
+          },
           {
             id: "columnHeaders",
             label: "Column Headers",
@@ -73,11 +81,11 @@ export function DragAndDropBoard() {
       />
 
       {boardState && (
-        <details className="rounded-lg border border-border bg-muted/30 p-4">
-          <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
+        <details className="border-border bg-muted/30 rounded-lg border p-4">
+          <summary className="text-muted-foreground cursor-pointer text-sm font-medium">
             Board state (API payload preview)
           </summary>
-          <pre className="mt-3 overflow-auto rounded bg-card p-3 text-xs text-foreground">
+          <pre className="bg-card text-foreground mt-3 overflow-auto rounded p-3 text-xs">
             {JSON.stringify(boardState, null, 2)}
           </pre>
         </details>

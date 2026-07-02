@@ -63,7 +63,8 @@ export function GroupedColumnTable<TData>({
   className,
 }: GroupedColumnTableProps<TData>) {
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
-  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({});
+  const [internalRowSelection, setInternalRowSelection] =
+    useState<RowSelectionState>({});
 
   const sorting = internalSorting;
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -76,7 +77,10 @@ export function GroupedColumnTable<TData>({
 
   const allColumns = useMemo<ColumnDef<TData, unknown>[]>(() => {
     if (!enableRowSelection) return columns;
-    return [buildSelectColumn<TData>() as ColumnDef<TData, unknown>, ...columns];
+    return [
+      buildSelectColumn<TData>() as ColumnDef<TData, unknown>,
+      ...columns,
+    ];
   }, [columns, enableRowSelection]);
 
   const table = useReactTable({
@@ -91,7 +95,8 @@ export function GroupedColumnTable<TData>({
       onSortingChange?.(next);
     },
     onRowSelectionChange: (updater) => {
-      const next = typeof updater === "function" ? updater(rowSelection) : updater;
+      const next =
+        typeof updater === "function" ? updater(rowSelection) : updater;
       setInternalRowSelection(next);
       onRowSelectionChange?.(next);
     },
@@ -99,7 +104,10 @@ export function GroupedColumnTable<TData>({
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const visibleLeafHeaders = useMemo(() => table.getHeaderGroups()[0]?.headers ?? [], [table]);
+  const visibleLeafHeaders = useMemo(
+    () => table.getHeaderGroups()[0]?.headers ?? [],
+    [table],
+  );
 
   // ── Build two-row header layout ───────────────────────────────────────────
   // Build a lookup: columnId → which group it belongs to
@@ -122,7 +130,12 @@ export function GroupedColumnTable<TData>({
    */
   const topRowCells = useMemo(() => {
     type TopCell =
-      | { type: "group"; group: ColumnGroup; span: number; firstHeaderId: string }
+      | {
+          type: "group";
+          group: ColumnGroup;
+          span: number;
+          firstHeaderId: string;
+        }
       | { type: "standalone"; headerId: string; columnId: string };
 
     const cells: TopCell[] = [];
@@ -146,7 +159,11 @@ export function GroupedColumnTable<TData>({
         cells.push({ type: "group", group, span, firstHeaderId });
         i += span;
       } else {
-        cells.push({ type: "standalone", headerId: header.id, columnId: colId });
+        cells.push({
+          type: "standalone",
+          headerId: header.id,
+          columnId: colId,
+        });
         i++;
       }
     }
@@ -157,7 +174,7 @@ export function GroupedColumnTable<TData>({
     <TableShell className={className}>
       <thead>
         {/* ── Row 1: group labels + standalone column headers ── */}
-        <tr className="border-b border-border bg-muted/50">
+        <tr className="border-border bg-muted/50 border-b">
           {topRowCells.map((cell) => {
             if (cell.type === "group") {
               return (
@@ -165,9 +182,10 @@ export function GroupedColumnTable<TData>({
                   key={`group-${cell.firstHeaderId}`}
                   colSpan={cell.span}
                   className={cn(
-                    "border-b border-border px-3 py-2 text-center text-xs font-semibold",
-                    "border-l border-r border-border/40",
-                    cell.group.className ?? "bg-accent/60 text-accent-foreground",
+                    "border-border border-b px-3 py-2 text-center text-xs font-semibold",
+                    "border-border/40 border-r border-l",
+                    cell.group.className ??
+                      "bg-accent/60 text-accent-foreground",
                   )}
                 >
                   {cell.group.label}
@@ -176,7 +194,9 @@ export function GroupedColumnTable<TData>({
             }
 
             // Standalone column — spans both header rows (rowSpan=2)
-            const header = visibleLeafHeaders.find((h) => h.id === cell.headerId);
+            const header = visibleLeafHeaders.find(
+              (h) => h.id === cell.headerId,
+            );
             if (!header) return null;
             const pinned = header.column.getIsPinned();
 
@@ -184,15 +204,21 @@ export function GroupedColumnTable<TData>({
               <th
                 key={cell.headerId}
                 rowSpan={2}
-                style={{ width: header.getSize(), ...getStickyStyle(header.column) }}
+                style={{
+                  width: header.getSize(),
+                  ...getStickyStyle(header.column),
+                }}
                 className={cn(
-                  "px-3 py-2.5 text-left text-xs font-medium text-muted-foreground",
-                  "border-b border-border bg-muted/50",
+                  "text-muted-foreground px-3 py-2.5 text-left text-xs font-medium",
+                  "border-border bg-muted/50 border-b",
                   getStickyClass(pinned),
                 )}
               >
                 <SortableHeader column={header.column}>
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
                 </SortableHeader>
               </th>
             );
@@ -200,7 +226,7 @@ export function GroupedColumnTable<TData>({
         </tr>
 
         {/* ── Row 2: individual column headers for grouped columns only ── */}
-        <tr className="border-b border-border bg-muted/30">
+        <tr className="border-border bg-muted/30 border-b">
           {visibleLeafHeaders.map((header) => {
             const group = columnToGroup.get(header.column.id);
             // Standalone columns already rendered with rowSpan=2 above — skip them
@@ -210,15 +236,21 @@ export function GroupedColumnTable<TData>({
             return (
               <th
                 key={header.id}
-                style={{ width: header.getSize(), ...getStickyStyle(header.column) }}
+                style={{
+                  width: header.getSize(),
+                  ...getStickyStyle(header.column),
+                }}
                 className={cn(
-                  "border-l border-border/30 px-3 py-2 text-left text-xs font-medium text-muted-foreground",
+                  "border-border/30 text-muted-foreground border-l px-3 py-2 text-left text-xs font-medium",
                   "bg-muted/30",
                   getStickyClass(pinned),
                 )}
               >
                 <SortableHeader column={header.column}>
-                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
                 </SortableHeader>
               </th>
             );
@@ -237,8 +269,8 @@ export function GroupedColumnTable<TData>({
               data-selected={row.getIsSelected()}
               onClick={() => onRowClick?.(row.original)}
               className={cn(
-                "border-b border-border/60 transition-colors last:border-0",
-                onRowClick && "cursor-pointer hover:bg-accent/40",
+                "border-border/60 border-b transition-colors last:border-0",
+                onRowClick && "hover:bg-accent/40 cursor-pointer",
                 row.getIsSelected() && "bg-primary/5",
               )}
             >
@@ -248,10 +280,13 @@ export function GroupedColumnTable<TData>({
                 return (
                   <td
                     key={cell.id}
-                    style={{ width: cell.column.getSize(), ...getStickyStyle(cell.column) }}
+                    style={{
+                      width: cell.column.getSize(),
+                      ...getStickyStyle(cell.column),
+                    }}
                     className={cn(
-                      "px-3 py-2.5 text-sm text-foreground",
-                      inGroup && "border-l border-border/20",
+                      "text-foreground px-3 py-2.5 text-sm",
+                      inGroup && "border-border/20 border-l",
                       getStickyClass(pinned),
                     )}
                   >

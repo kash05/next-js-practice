@@ -73,7 +73,7 @@
   *,
   *::before,
   *::after {
-    @apply box-border border-border;
+    @apply border-border box-border;
   }
 
   html {
@@ -118,7 +118,7 @@
 
   /* Focus — visible only on keyboard nav, not mouse */
   :focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    @apply ring-ring ring-offset-background ring-2 ring-offset-2 outline-none;
   }
 }
 
@@ -148,9 +148,9 @@
     @apply mb-6 flex items-center justify-between;
   }
   .page-title {
-    @apply text-2xl font-semibold tracking-tight text-foreground;
+    @apply text-foreground text-2xl font-semibold tracking-tight;
   }
   .page-description {
-    @apply mt-1 text-sm text-muted-foreground;
+    @apply text-muted-foreground mt-1 text-sm;
   }
 }

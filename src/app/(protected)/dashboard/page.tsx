@@ -11,7 +11,7 @@ export default function DashboardPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Welcome back.</p>
+          <p className="text-muted-foreground text-sm">Welcome back.</p>
         </div>
         <DragAndDropBoard />
       </div>

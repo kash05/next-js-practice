@@ -12,7 +12,9 @@ import { useAuth } from "./useAuth";
 export function useRoleGuard(allowedRoles: string[]) {
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  const hasRole = isAuthenticated ? allowedRoles.some((r) => user?.roles.includes(r)) : false;
+  const hasRole = isAuthenticated
+    ? allowedRoles.some((r) => user?.roles.includes(r))
+    : false;
 
   return { hasRole, isLoading };
 }

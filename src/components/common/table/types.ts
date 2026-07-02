@@ -1,4 +1,8 @@
-import { ColumnDef, RowSelectionState, SortingState } from "@tanstack/react-table";
+import {
+  ColumnDef,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared props that every table variant accepts
@@ -52,7 +56,11 @@ export interface GroupedRowTableProps<TData> extends BaseTableProps<TData> {
   /** Optional — derive a display label from the raw group value. */
   getGroupLabel?: (value: TData[keyof TData], rows: TData[]) => string;
   /** Optional — custom renderer for the entire group label cell. */
-  renderGroupLabel?: (group: { key: string; label: string; rows: TData[] }) => React.ReactNode;
+  renderGroupLabel?: (group: {
+    key: string;
+    label: string;
+    rows: TData[];
+  }) => React.ReactNode;
   /** Width of the group label column in px. Default: 120. */
   groupLabelWidth?: number;
 }

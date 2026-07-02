@@ -13,14 +13,18 @@ export function LoginCard() {
   }
 
   return (
-    <div className="w-full max-w-sm space-y-8 rounded-xl border border-border bg-card p-8 shadow-sm">
+    <div className="border-border bg-card w-full max-w-sm space-y-8 rounded-xl border p-8 shadow-sm">
       {/* Brand */}
       <div className="space-y-2 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-          <span className="text-xl font-bold text-primary-foreground">M</span>
+        <div className="bg-primary mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+          <span className="text-primary-foreground text-xl font-bold">M</span>
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Welcome back</h1>
-        <p className="text-sm text-muted-foreground">Sign in to your account to continue</p>
+        <h1 className="text-foreground text-2xl font-semibold tracking-tight">
+          Welcome back
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          Sign in to your account to continue
+        </p>
       </div>
 
       {/* ── MSAL login button (uncomment when Azure AD is configured) ──────────
@@ -53,16 +57,18 @@ export function LoginCard() {
       <button
         onClick={handleLogin}
         disabled={isLoading}
-        className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-60"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-60"
       >
         {isLoading && (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+          <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
         )}
         {isLoading ? "Signing in..." : "Sign in"}
       </button>
 
-      <p className="text-center text-xs text-muted-foreground">
-        <span className="bg-warning/15 text-warning rounded px-1.5 py-0.5 font-medium">DEV</span>{" "}
+      <p className="text-muted-foreground text-center text-xs">
+        <span className="bg-warning/15 text-warning rounded px-1.5 py-0.5 font-medium">
+          DEV
+        </span>{" "}
         MSAL disabled — using local auth bypass
       </p>
       {/* ── end dev login block ── */}

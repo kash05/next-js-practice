@@ -1,4 +1,8 @@
-import { Configuration, LogLevel, BrowserCacheLocation } from "@azure/msal-browser";
+import {
+  Configuration,
+  LogLevel,
+  BrowserCacheLocation,
+} from "@azure/msal-browser";
 
 export const msalConfig: Configuration = {
   auth: {
@@ -17,7 +21,10 @@ export const msalConfig: Configuration = {
         if (level === LogLevel.Error) console.error("[MSAL]", message);
         if (level === LogLevel.Warning) console.warn("[MSAL]", message);
       },
-      logLevel: process.env.NODE_ENV === "development" ? LogLevel.Warning : LogLevel.Error,
+      logLevel:
+        process.env.NODE_ENV === "development"
+          ? LogLevel.Warning
+          : LogLevel.Error,
       piiLoggingEnabled: false,
     },
   },
