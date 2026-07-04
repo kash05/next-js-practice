@@ -1,35 +1,39 @@
 @import "tailwindcss";
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   THEME TOKENS
-   
-   @theme registers CSS variables as Tailwind utility classes automatically.
-   --color-primary     → bg-primary, text-primary, border-primary
-   --color-bg-page     → bg-bg-page
-   --font-sans         → font-sans
-   --radius-md         → rounded-md
-   
-   To add dark mode later:
-     @variant dark (&:where(.dark, .dark *)) {
-       --color-bg-page: #0f1117;
-       ...override only semantic tokens...
-     }
-───────────────────────────────────────────────────────────────────────────── */
+/*
+ * DESIGN TOKENS
+ *
+ * @theme registers CSS variables as Tailwind utility classes automatically.
+ *   --color-primary      → bg-primary, text-primary, border-primary
+ *   --color-text-primary → text-text-primary
+ *   --radius-md          → rounded-md
+ *
+ * Theme: Dark Orange + White
+ *   Primary  : #ea580c (orange-600)
+ *   Sidebar  : #18181b (zinc-900)
+ *   Surfaces : #ffffff / #f9fafb
+ *
+ * Adding dark mode:
+ *   @variant dark (&:where(.dark, .dark *)) {
+ *     --color-bg-page: #09090b;
+ *     ... override semantic tokens only ...
+ *   }
+ */
 
 @theme {
-  /* ── Fonts ──────────────────────────────────────────────────────────────── */
+  /* Fonts */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  /* ── Border radius ──────────────────────────────────────────────────────── */
-  --radius-sm: 0.25rem; /* 4px  */
-  --radius-md: 0.375rem; /* 6px  */
-  --radius-lg: 0.5rem; /* 8px  */
-  --radius-xl: 0.75rem; /* 12px */
-  --radius-2xl: 1rem; /* 16px */
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
   --radius-full: 9999px;
 
-  /* ── Shadows ────────────────────────────────────────────────────────────── */
+  /* Shadows */
   --shadow-sm:
     0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --shadow-md:
@@ -37,80 +41,80 @@
   --shadow-lg:
     0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 
-  /* ── Primary brand ──────────────────────────────────────────────────────── */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-subtle: #eff6ff;
+  /* Primary — orange */
+  --color-primary: #ea580c;
+  --color-primary-hover: #c2410c;
+  --color-primary-subtle: #fff7ed;
   --color-primary-fg: #ffffff;
 
-  /* ── Secondary ──────────────────────────────────────────────────────────── */
-  --color-secondary: #f3f4f6;
-  --color-secondary-hover: #e5e7eb;
-  --color-secondary-fg: #374151;
+  /* Secondary */
+  --color-secondary: #f4f4f5;
+  --color-secondary-hover: #e4e4e7;
+  --color-secondary-fg: #3f3f46;
 
-  /* ── Page backgrounds ───────────────────────────────────────────────────── */
-  --color-bg-page: #f8f9fb;
+  /* Page backgrounds */
+  --color-bg-page: #f9fafb;
   --color-bg-subtle: #f3f4f6;
   --color-bg-muted: #e5e7eb;
 
-  /* ── Surface (cards, panels) ────────────────────────────────────────────── */
+  /* Surfaces — cards, panels, modals */
   --color-surface: #ffffff;
 
-  /* ── Text ───────────────────────────────────────────────────────────────── */
-  --color-text-primary: #111827;
-  --color-text-secondary: #374151;
-  --color-text-tertiary: #6b7280;
-  --color-text-disabled: #9ca3af;
+  /* Text */
+  --color-text-primary: #09090b;
+  --color-text-secondary: #3f3f46;
+  --color-text-tertiary: #71717a;
+  --color-text-disabled: #a1a1aa;
   --color-text-inverse: #ffffff;
-  --color-text-brand: #2563eb;
+  --color-text-brand: #ea580c;
 
-  /* ── Borders ────────────────────────────────────────────────────────────── */
-  --color-border: #e5e7eb;
-  --color-border-strong: #d1d5db;
-  --color-border-focus: #2563eb;
+  /* Borders */
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+  --color-border-focus: #ea580c;
 
-  /* ── Status ─────────────────────────────────────────────────────────────── */
+  /* Status — success */
   --color-success: #16a34a;
   --color-success-bg: #f0fdf4;
   --color-success-fg: #ffffff;
   --color-success-text: #14532d;
 
+  /* Status — warning */
   --color-warning: #d97706;
   --color-warning-bg: #fffbeb;
   --color-warning-fg: #ffffff;
   --color-warning-text: #78350f;
 
+  /* Status — error */
   --color-error: #dc2626;
   --color-error-bg: #fef2f2;
   --color-error-fg: #ffffff;
   --color-error-text: #7f1d1d;
 
-  /* ── Sidebar ────────────────────────────────────────────────────────────── */
-  --color-sidebar: #1c2132;
-  --color-sidebar-fg: #e2e8f0;
-  --color-sidebar-border: #2d3748;
-  --color-sidebar-item-hover: #2d3748;
-  --color-sidebar-item-active: #3b4a6b;
-  --color-sidebar-item-fg: #94a3b8;
-  --color-sidebar-muted-fg: #64748b;
+  /* Sidebar — dark zinc with orange accents */
+  --color-sidebar: #18181b;
+  --color-sidebar-fg: #f4f4f5;
+  --color-sidebar-border: #27272a;
+  --color-sidebar-item-hover: #27272a;
+  --color-sidebar-item-active: #ea580c;
+  --color-sidebar-item-fg: #a1a1aa;
+  --color-sidebar-muted-fg: #71717a;
 
-  /* ── shadcn/ui aliases ──────────────────────────────────────────────────── */
-  --color-background: #f8f9fb;
-  --color-foreground: #111827;
+  /* shadcn/ui compatibility aliases — keep so existing class names still work */
+  --color-background: #f9fafb;
+  --color-foreground: #09090b;
   --color-card: #ffffff;
-  --color-card-foreground: #111827;
+  --color-card-foreground: #09090b;
   --color-muted: #f3f4f6;
-  --color-muted-foreground: #6b7280;
-  --color-accent: #e5e7eb;
-  --color-accent-foreground: #374151;
+  --color-muted-foreground: #71717a;
+  --color-accent: #e4e4e7;
+  --color-accent-foreground: #3f3f46;
   --color-destructive: #dc2626;
-  --color-ring: #2563eb;
-  --color-input: #d1d5db;
+  --color-ring: #ea580c;
+  --color-input: #d4d4d8;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   BASE RESETS
-───────────────────────────────────────────────────────────────────────────── */
+/* BASE RESETS */
 @layer base {
   *,
   *::before,
@@ -174,9 +178,7 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   UTILITIES
-───────────────────────────────────────────────────────────────────────────── */
+/* UTILITIES */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;

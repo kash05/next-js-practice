@@ -10,6 +10,7 @@ export interface AuthUser {
   email: string;
   tenantId: string;
   accountId: string;
+  /** Roles from the Azure AD id_token `roles` claim. Populated only when App Roles are assigned in Azure Portal. */
   roles: string[];
 }
 
@@ -19,46 +20,34 @@ function mapAccount(account: AccountInfo): AuthUser {
     email: account.username ?? "",
     tenantId: account.tenantId ?? "",
     accountId: account.localAccountId ?? "",
-    // Roles come from the `roles` claim in the Azure AD id_token.
-    // They are populated only when App Roles are assigned in Azure Portal.
     roles: (account.idTokenClaims?.roles as string[]) ?? [],
   };
 }
 
+/**
+ * Low-level MSAL hook. Prefer useAuthContext() in components — this is
+ * consumed by AuthContext and should not be used directly elsewhere.
+ *
+ * Handles:
+ *  - Active account selection (multi-account edge case)
+ *  - LOGIN_SUCCESS event to set active account immediately after redirect
+ *  - Silent token acquisition with redirect fallback on expiry
+ *
+ * Session restore: MSAL reads localStorage before React mounts, so
+ * isAuthenticated is already true on first render for returning users.
+ */
 export function useAuth() {
   const { instance, inProgress } = useMsal();
   const isAuthenticated = useIsAuthenticated();
   const account = useAccount();
 
-  // ── Session restore on tab reopen ──────────────────────────────────────────
-  // MSAL stores tokens in localStorage (configured in msal.config.ts).
-  // On page load, MSAL hydrates its internal state from localStorage before
-  // React even mounts — so by the time useAccount() runs, the cached account
-  // is already present and isAuthenticated is already true.
-  // No extra code is needed for session restore. This comment is here so the
-  // behaviour is explicit and not a surprise to future maintainers.
-  //
-  // What MSAL restores:  id_token, access_token (if not expired), account info
-  // What MSAL re-fetches: access_token silently if expired (acquireTokenSilent)
-  // What triggers re-login: refresh_token expiry (default: 90 days in Azure AD)
-  // ──────────────────────────────────────────────────────────────────────────
-
-  // ── Handle redirect response after loginRedirect() ────────────────────────
-  // After Azure redirects back to the app, MSAL processes the hash/query params.
-  // handleRedirectPromise() MUST be called to complete the login flow.
-  // @azure/msal-react's MsalProvider calls this automatically — nothing to do here.
-  // ──────────────────────────────────────────────────────────────────────────
-
-  // ── Set active account when one isn't set ─────────────────────────────────
-  // Handles edge case where multiple accounts are cached (e.g. user logged into
-  // two tenants). We pick the first available account.
   useEffect(() => {
+    // Set active account if not already set (e.g. multiple cached accounts)
     if (!instance.getActiveAccount() && instance.getAllAccounts().length > 0) {
-      instance.setActiveAccount(instance.getAllAccounts()[0]);
+      instance.setActiveAccount(instance.getAllAccounts()[0] ?? null);
     }
 
-    // Subscribe to LOGIN_SUCCESS so the active account is set immediately
-    // after a fresh loginRedirect, before React re-renders.
+    // Set active account immediately after a fresh loginRedirect completes
     const callbackId = instance.addEventCallback((event) => {
       if (
         event.eventType === EventType.LOGIN_SUCCESS &&
@@ -74,17 +63,17 @@ export function useAuth() {
       if (callbackId) instance.removeEventCallback(callbackId);
     };
   }, [instance]);
-  // ──────────────────────────────────────────────────────────────────────────
 
   const isLoading = inProgress !== InteractionStatus.None;
   const user = account ? mapAccount(account) : null;
 
-  function login() {
-    instance.loginRedirect(loginRequest);
+  // void discards Promise<void> — login() is typed as () => void in AuthContextValue
+  function login(): void {
+    void instance.loginRedirect(loginRequest);
   }
 
-  function logout() {
-    instance.logoutRedirect({
+  function logout(): void {
+    void instance.logoutRedirect({
       account: account ?? undefined,
       postLogoutRedirectUri: "/login",
     });
@@ -101,9 +90,8 @@ export function useAuth() {
       });
       return result.accessToken;
     } catch {
-      // Silent acquisition failed (refresh token expired, consent needed, etc.)
-      // Fall back to redirect — user will be sent to Azure AD and returned.
-      instance.acquireTokenRedirect({ ...apiRequest, account });
+      // Silent failed (refresh token expired, consent required) — fall back to redirect
+      void instance.acquireTokenRedirect({ ...apiRequest, account });
       throw new Error("Token acquisition failed — initiating redirect");
     }
   }

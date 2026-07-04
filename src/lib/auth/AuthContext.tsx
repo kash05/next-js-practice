@@ -10,8 +10,11 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   permissions: Set<Permission>;
+  /** Returns true if the user has the given permission. */
   can: (permission: Permission) => boolean;
+  /** Returns true if the user has ALL of the given permissions. */
   canAll: (...permissions: Permission[]) => boolean;
+  /** Returns true if the user has ANY of the given permissions. */
   canAny: (...permissions: Permission[]) => boolean;
   login: () => void;
   logout: () => void;
@@ -20,31 +23,30 @@ export interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DEV BYPASS — active until MSAL is configured
-// To enable real MSAL auth:
-//   1. Set DEV_BYPASS = false  (or flip to process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true")
-//   2. Fill in .env.local with your Azure client ID and tenant ID
-//   3. Uncomment the MSAL button in LoginCard.tsx
-// ─────────────────────────────────────────────────────────────────────────────
+/*
+ * DEV BYPASS — skips Azure AD during local development.
+ *
+ * To enable real MSAL auth:
+ *   1. Set DEV_BYPASS = false
+ *   2. Fill in .env.local with NEXT_PUBLIC_AZURE_CLIENT_ID and NEXT_PUBLIC_AZURE_TENANT_ID
+ *   3. Uncomment the MSAL button in LoginCard.tsx
+ *
+ * Change DEV_USER.roles to test different permission levels without re-logging in.
+ */
 const DEV_BYPASS = true;
-// const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true"; // ← use this in production
+// const DEV_BYPASS = process.env.NEXT_PUBLIC_DEV_AUTH_BYPASS === "true"; // ← production
 
 const DEV_USER: AuthUser = {
   name: "Dev User",
   email: "dev@example.com",
   tenantId: "dev-tenant",
   accountId: "dev-account",
-  roles: [ROLES.SUPER_ADMIN], // change to test different roles e.g. ROLES.VIEWER
+  roles: [ROLES.SUPER_ADMIN],
 };
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
-  // Always call MSAL hooks — rules of hooks require unconditional calls.
-  // When DEV_BYPASS=true its return value is simply never used.
+  // MSAL hooks must always be called — rules of hooks. Ignored when DEV_BYPASS=true.
   const msalAuth = useAuth();
-
-  // Dev-only local auth state
   const [devAuthenticated, setDevAuthenticated] = useState(false);
 
   const auth = DEV_BYPASS
@@ -58,10 +60,11 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
       }
     : msalAuth;
 
+  // Stable string key avoids re-computing permissions on every render
   const rolesKey = (auth.user?.roles ?? []).join(",");
   const permissions = useMemo(
     () => resolvePermissions(auth.user?.roles ?? []),
-    [rolesKey],
+    [rolesKey], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const can = (permission: Permission): boolean => permissions.has(permission);
