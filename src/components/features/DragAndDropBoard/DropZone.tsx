@@ -6,7 +6,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { cn } from "@/lib/utils";
-import { DropZoneId } from "./types";
+import { DropZoneId, ZoneCategory } from "./types";
 import { ZoneItem as ZoneItemType } from "./useDragAndDropBoard";
 import { ZoneItem } from "./DraggableItem";
 
@@ -36,7 +36,7 @@ const ZONE_ICONS: Record<DropZoneId, React.ReactNode> = {
       <rect x="14" y="2" width="4" height="16" rx="0.5" />
     </svg>
   ),
-  rowHeaders: (
+  rowDimensions: (
     <svg
       className="h-3.5 w-3.5"
       viewBox="0 0 20 20"
@@ -50,7 +50,7 @@ const ZONE_ICONS: Record<DropZoneId, React.ReactNode> = {
       <line x1="10" y1="14" x2="18" y2="14" />
     </svg>
   ),
-  columnHeaders: (
+  columnDimensions: (
     <svg
       className="h-3.5 w-3.5"
       viewBox="0 0 20 20"
@@ -70,6 +70,8 @@ interface DropZoneProps {
   id: DropZoneId;
   label: string;
   description?: string;
+  /** Which category of field this zone accepts — used for placeholder hint text */
+  accepts: ZoneCategory;
   items: ZoneItemType[];
   isOver: boolean;
   onRemoveItem: (dndId: string) => void;
@@ -80,6 +82,7 @@ export function DropZone({
   id,
   label,
   description,
+  accepts,
   items,
   isOver,
   onRemoveItem,
@@ -87,6 +90,9 @@ export function DropZone({
 }: DropZoneProps) {
   const { setNodeRef } = useDroppable({ id });
   const isEmpty = items.length === 0;
+
+  const emptyHint =
+    accepts === "dimension" ? "Drag a dimension here" : "Drag a measure here";
 
   return (
     <div
@@ -99,19 +105,20 @@ export function DropZone({
         isOver && "border-primary/70 bg-primary/5 shadow-primary/10 shadow-md",
       )}
     >
+      {/* Header */}
       <div
         className={cn(
           "flex shrink-0 items-center justify-between border-b px-3 py-2 transition-colors duration-200",
           isOver
             ? "border-primary/20 bg-primary/10"
-            : "border-border/60 bg-muted/40",
+            : "border-border/60 bg-bg-subtle/60",
         )}
       >
         <div className="flex min-w-0 items-center gap-2">
           <span
             className={cn(
               "shrink-0 transition-colors duration-200",
-              isOver ? "text-primary" : "text-muted-foreground/70",
+              isOver ? "text-primary" : "text-text-tertiary",
             )}
           >
             {ZONE_ICONS[id]}
@@ -120,13 +127,13 @@ export function DropZone({
             <p
               className={cn(
                 "truncate text-xs leading-tight font-semibold transition-colors duration-200",
-                isOver ? "text-primary" : "text-foreground",
+                isOver ? "text-primary" : "text-text-primary",
               )}
             >
               {label}
             </p>
             {description && (
-              <p className="text-muted-foreground/60 mt-0.5 truncate text-[10px] leading-none">
+              <p className="text-text-tertiary/70 mt-0.5 truncate text-[10px] leading-none">
                 {description}
               </p>
             )}
@@ -143,7 +150,7 @@ export function DropZone({
             <button
               type="button"
               onClick={onClear}
-              className="text-muted-foreground/40 hover:bg-destructive/10 hover:text-destructive rounded p-0.5 transition-colors"
+              className="text-text-tertiary/50 hover:bg-error-bg hover:text-error rounded p-0.5 transition-colors"
               title="Clear all"
             >
               <svg
@@ -161,6 +168,7 @@ export function DropZone({
         </div>
       </div>
 
+      {/* Scrollable item list */}
       <SortableContext
         items={items.map((i) => i.dndId)}
         strategy={verticalListSortingStrategy}
@@ -172,7 +180,7 @@ export function DropZone({
                 <svg
                   className={cn(
                     "h-5 w-5 transition-colors duration-200",
-                    isOver ? "text-primary/60" : "text-muted-foreground/20",
+                    isOver ? "text-primary/60" : "text-text-disabled/40",
                   )}
                   viewBox="0 0 20 20"
                   fill="none"
@@ -188,10 +196,10 @@ export function DropZone({
                 <p
                   className={cn(
                     "text-[10px] font-medium transition-colors duration-200",
-                    isOver ? "text-primary/80" : "text-muted-foreground/40",
+                    isOver ? "text-primary/80" : "text-text-disabled/50",
                   )}
                 >
-                  {isOver ? "Release to drop" : "Drag or click a field"}
+                  {isOver ? "Release to drop" : emptyHint}
                 </p>
               </div>
             </div>

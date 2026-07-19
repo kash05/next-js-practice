@@ -20,7 +20,7 @@ export function SourceItem({ field, dndId, onClick, isUsed }: SourceItemProps) {
   const { attributes, listeners, setNodeRef, isDragging, transform } =
     useDraggable({
       id: dndId,
-      disabled: isUsed,
+      disabled: isUsed || false,
     });
 
   const style: React.CSSProperties = {

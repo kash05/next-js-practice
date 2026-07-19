@@ -10,6 +10,7 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import {
   BoardState,
+  DropZoneConfig,
   DropZoneId,
   FieldItem,
   encodeDndId,
@@ -19,8 +20,8 @@ import {
 const DROP_ZONE_IDS: DropZoneId[] = [
   "rowMeasures",
   "columnMeasures",
-  "rowHeaders",
-  "columnHeaders",
+  "rowDimensions",
+  "columnDimensions",
 ];
 
 function isDropZoneId(id: string): id is DropZoneId {
@@ -49,18 +50,21 @@ export type ZoneMap = Record<DropZoneId, ZoneItem[]>;
 interface UseDragDropBoardOptions {
   initialState?: Partial<BoardState>;
   onChange?: (state: BoardState) => void;
+  /** Zone configs — used to enforce category restrictions on drop */
+  zoneConfigs?: DropZoneConfig[];
 }
 
 export function useDragDropBoard({
   initialState,
   onChange,
+  zoneConfigs = [],
 }: UseDragDropBoardOptions) {
   const [zones, setZones] = useState<ZoneMap>(() => {
     const init: ZoneMap = {
       rowMeasures: [],
       columnMeasures: [],
-      rowHeaders: [],
-      columnHeaders: [],
+      rowDimensions: [],
+      columnDimensions: [],
     };
     if (!initialState) return init;
     for (const zoneId of DROP_ZONE_IDS) {
@@ -77,6 +81,10 @@ export function useDragDropBoard({
   // Refs for list items — avoids re-renders when lists update
   const listARef = useRef<FieldItem[]>([]);
   const listBRef = useRef<FieldItem[]>([]);
+  const zoneConfigsRef = useRef<DropZoneConfig[]>(zoneConfigs);
+  useEffect(() => {
+    zoneConfigsRef.current = zoneConfigs;
+  }, [zoneConfigs]);
 
   const setListA = useCallback((items: FieldItem[]) => {
     listARef.current = items;
@@ -93,6 +101,16 @@ export function useDragDropBoard({
     return s;
   }, [zones]);
 
+  /**
+   * Returns true if the field's category matches what the target zone accepts.
+   * Measures can only go into measure zones, dimensions only into dimension zones.
+   */
+  function isDropAllowed(field: FieldItem, targetZoneId: DropZoneId): boolean {
+    const config = zoneConfigsRef.current.find((z) => z.id === targetZoneId);
+    if (!config) return true;
+    return field.category === config.accepts;
+  }
+
   const pendingEmit = useRef<ZoneMap | null>(null);
   const onChangeRef = useRef(onChange);
   useEffect(() => {
@@ -106,8 +124,8 @@ export function useDragDropBoard({
     onChangeRef.current?.({
       rowMeasures: next.rowMeasures.map(({ dndId: _, ...f }) => f),
       columnMeasures: next.columnMeasures.map(({ dndId: _, ...f }) => f),
-      rowHeaders: next.rowHeaders.map(({ dndId: _, ...f }) => f),
-      columnHeaders: next.columnHeaders.map(({ dndId: _, ...f }) => f),
+      rowDimensions: next.rowDimensions.map(({ dndId: _, ...f }) => f),
+      columnDimensions: next.columnDimensions.map(({ dndId: _, ...f }) => f),
     });
   }, [zones]);
 
@@ -179,20 +197,16 @@ export function useDragDropBoard({
     if (!activeParsed) return;
 
     let targetZone: DropZoneId | null = null;
-    if (isDropZoneId(overId)) {
-      targetZone = overId;
-    } else {
-      const op = decodeDndId(overId);
-      targetZone = op?.zoneId ?? null;
-    }
+    if (isDropZoneId(overId)) targetZone = overId;
+    else targetZone = decodeDndId(overId)?.zoneId ?? null;
     if (!targetZone) return;
 
     setZones((prev) => {
       const next: ZoneMap = {
         rowMeasures: [...prev.rowMeasures],
         columnMeasures: [...prev.columnMeasures],
-        rowHeaders: [...prev.rowHeaders],
-        columnHeaders: [...prev.columnHeaders],
+        rowDimensions: [...prev.rowDimensions],
+        columnDimensions: [...prev.columnDimensions],
       };
 
       // ── List → zone ────────────────────────────────────────────────────
@@ -206,14 +220,18 @@ export function useDragDropBoard({
             : listBRef.current;
         const field = list.find((f) => f.id === activeParsed.fieldId);
         if (!field) return prev;
+
         const alreadyUsed = DROP_ZONE_IDS.some((z) =>
           next[z].some((i) => i.id === field.id),
         );
         if (alreadyUsed) return prev;
 
-        const newItem = makeZoneItem(field, targetZone);
+        // Category restriction — silent rejection, item stays in list
+        if (!isDropAllowed(field, targetZone!)) return prev;
+
+        const newItem = makeZoneItem(field, targetZone!);
         const overParsed = decodeDndId(overId);
-        const targetItems = next[targetZone];
+        const targetItems = next[targetZone!];
         if (overParsed?.zoneId === targetZone) {
           const idx = targetItems.findIndex((z) => z.dndId === overId);
           if (idx !== -1) targetItems.splice(idx, 0, newItem);
@@ -225,7 +243,7 @@ export function useDragDropBoard({
         return next;
       }
 
-      // ── Zone → zone (reorder or cross-zone move) ──────────────────────
+      // ── Zone → zone (reorder or move) ──────────────────────────────────
       if (activeParsed.sourceType === "zone") {
         const sourceZone = activeParsed.zoneId ?? findItemZone(activeId, prev);
         if (!sourceZone) return prev;
@@ -233,6 +251,9 @@ export function useDragDropBoard({
         const sourceItems = next[sourceZone];
         const activeIndex = sourceItems.findIndex((z) => z.dndId === activeId);
         if (activeIndex === -1) return prev;
+
+        const movedField = sourceItems[activeIndex];
+        if (!movedField) return prev;
 
         if (sourceZone === targetZone) {
           // Reorder within same zone
@@ -243,19 +264,24 @@ export function useDragDropBoard({
               next[sourceZone] = arrayMove(sourceItems, activeIndex, overIndex);
           }
         } else {
-          // Move to different zone
+          // Moving between zones — enforce category restriction
+          if (!isDropAllowed(movedField, targetZone!)) return prev;
+
           const [movedItem] = sourceItems.splice(activeIndex, 1);
+          if (!movedItem) return prev;
           next[sourceZone] = sourceItems;
+
           const updatedItem: ZoneItem = {
             ...movedItem,
             dndId: encodeDndId({
               sourceType: "zone",
-              zoneId: targetZone,
+              zoneId: targetZone!,
               fieldId: movedItem.id,
               instanceKey: makeInstanceKey(),
             }),
           };
-          const targetItems = next[targetZone];
+
+          const targetItems = next[targetZone!];
           const overParsed = decodeDndId(overId);
           if (overParsed?.zoneId === targetZone) {
             const idx = targetItems.findIndex((z) => z.dndId === overId);
@@ -281,6 +307,7 @@ export function useDragDropBoard({
 
   const addToZone = useCallback(
     (field: FieldItem, zoneId: DropZoneId) => {
+      if (!isDropAllowed(field, zoneId)) return; // category restriction on click too
       setZones((prev) => {
         const alreadyUsed = DROP_ZONE_IDS.some((z) =>
           prev[z].some((i) => i.id === field.id),
@@ -326,8 +353,8 @@ export function useDragDropBoard({
     (): BoardState => ({
       rowMeasures: zones.rowMeasures.map(({ dndId: _, ...f }) => f),
       columnMeasures: zones.columnMeasures.map(({ dndId: _, ...f }) => f),
-      rowHeaders: zones.rowHeaders.map(({ dndId: _, ...f }) => f),
-      columnHeaders: zones.columnHeaders.map(({ dndId: _, ...f }) => f),
+      rowDimensions: zones.rowDimensions.map(({ dndId: _, ...f }) => f),
+      columnDimensions: zones.columnDimensions.map(({ dndId: _, ...f }) => f),
     }),
     [zones],
   );

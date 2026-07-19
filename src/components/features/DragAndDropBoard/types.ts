@@ -1,23 +1,31 @@
 /** A single draggable field item */
 export interface FieldItem {
-  /** Unique identifier — used as dnd-kit's id */
   id: string;
   /** Display label */
   label: string;
+  /**
+   * Category determines which zones this item can be dropped into.
+   * "measure" → only measure zones (rowMeasures, columnMeasures)
+   * "dimension" → only dimension zones (rowDimensions, columnDimensions)
+   */
+  category: "measure" | "dimension";
   /** Optional metadata (data type, format, etc.) — passed through untouched */
   meta?: Record<string, unknown>;
 }
 
 /** The four report axis zones */
 export type DropZoneId =
-  "rowMeasures" | "columnMeasures" | "rowHeaders" | "columnHeaders";
+  "rowMeasures" | "columnMeasures" | "rowDimensions" | "columnDimensions";
+
+/** Which category of field a zone accepts */
+export type ZoneCategory = "measure" | "dimension";
 
 /** Snapshot of all four drop zones — this is what gets sent to the API */
 export interface BoardState {
   rowMeasures: FieldItem[];
   columnMeasures: FieldItem[];
-  rowHeaders: FieldItem[];
-  columnHeaders: FieldItem[];
+  rowDimensions: FieldItem[];
+  columnDimensions: FieldItem[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -53,23 +61,21 @@ export function decodeDndId(raw: string): DndId | null {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Props for the public DragDropBoard component
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface DropZoneConfig {
   id: DropZoneId;
   label: string;
   description?: string;
+  /** Which category of field this zone accepts */
+  accepts: ZoneCategory;
 }
 
 export interface DragDropBoardProps {
-  /** Items for the first (left) source list */
+  /** Dimensions list — shown first (left panel) */
   listA: FieldItem[];
   listALabel?: string;
   listALoading?: boolean;
 
-  /** Items for the second source list */
+  /** Measures list — shown second (right panel) */
   listB: FieldItem[];
   listBLabel?: string;
   listBLoading?: boolean;

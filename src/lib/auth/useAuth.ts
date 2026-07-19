@@ -73,10 +73,7 @@ export function useAuth() {
   }
 
   function logout(): void {
-    void instance.logoutRedirect({
-      account: account ?? undefined,
-      postLogoutRedirectUri: "/login",
-    });
+    void instance.logoutRedirect();
   }
 
   async function getAccessToken(): Promise<string> {

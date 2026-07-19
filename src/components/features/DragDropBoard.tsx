@@ -5,27 +5,112 @@ import { BoardState, DragDropBoard, FieldItem } from "./DragAndDropBoard";
 
 // ── Mock data — replace with real API calls ───────────────────────────────────
 const MOCK_MEASURES: FieldItem[] = [
-  { id: "revenue", label: "Revenue", meta: { type: "currency" } },
-  { id: "profit", label: "Profit", meta: { type: "currency" } },
-  { id: "units_sold", label: "Units Sold", meta: { type: "number" } },
-  { id: "cost", label: "Cost", meta: { type: "currency" } },
-  { id: "margin", label: "Margin %", meta: { type: "percent" } },
-  { id: "orders", label: "Order Count", meta: { type: "number" } },
-  { id: "returns", label: "Returns", meta: { type: "number" } },
-  { id: "avg_order", label: "Avg Order Value", meta: { type: "currency" } },
+  {
+    id: "revenue",
+    label: "Revenue",
+    meta: { type: "currency" },
+    category: "measure",
+  },
+  {
+    id: "profit",
+    label: "Profit",
+    meta: { type: "currency" },
+    category: "measure",
+  },
+  {
+    id: "units_sold",
+    label: "Units Sold",
+    meta: { type: "number" },
+    category: "measure",
+  },
+  {
+    id: "cost",
+    label: "Cost",
+    meta: { type: "currency" },
+    category: "measure",
+  },
+  {
+    id: "margin",
+    label: "Margin %",
+    meta: { type: "percent" },
+    category: "measure",
+  },
+  {
+    id: "orders",
+    label: "Order Count",
+    meta: { type: "number" },
+    category: "measure",
+  },
+  {
+    id: "returns",
+    label: "Returns",
+    meta: { type: "number" },
+    category: "measure",
+  },
+  {
+    id: "avg_order",
+    label: "Avg Order Value",
+    meta: { type: "currency" },
+    category: "measure",
+  },
 ];
 
 const MOCK_DIMENSIONS: FieldItem[] = [
-  { id: "region", label: "Region", meta: { type: "dimension" } },
-  { id: "country", label: "Country", meta: { type: "dimension" } },
-  { id: "city", label: "City", meta: { type: "dimension" } },
-  { id: "category", label: "Category", meta: { type: "dimension" } },
-  { id: "sub_category", label: "Sub-Category", meta: { type: "dimension" } },
-  { id: "product", label: "Product", meta: { type: "dimension" } },
-  { id: "customer", label: "Customer Segment", meta: { type: "dimension" } },
-  { id: "channel", label: "Sales Channel", meta: { type: "dimension" } },
-  { id: "quarter", label: "Quarter", meta: { type: "time" } },
-  { id: "year", label: "Year", meta: { type: "time" } },
+  {
+    id: "region",
+    label: "Region",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "country",
+    label: "Country",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "city",
+    label: "City",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "category",
+    label: "Category",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "sub_category",
+    label: "Sub-Category",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "product",
+    label: "Product",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "customer",
+    label: "Customer Segment",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "channel",
+    label: "Sales Channel",
+    meta: { type: "dimension" },
+    category: "dimension",
+  },
+  {
+    id: "quarter",
+    label: "Quarter",
+    meta: { type: "time" },
+    category: "dimension",
+  },
+  { id: "year", label: "Year", meta: { type: "time" }, category: "dimension" },
 ];
 
 function useFieldData(mockData: FieldItem[], delay: number) {
@@ -61,21 +146,25 @@ export function DragAndDropBoard() {
             id: "rowMeasures",
             label: "Row Measures",
             description: "Numeric values for rows",
+            accepts: "measure",
           },
           {
             id: "columnMeasures",
             label: "Column Measures",
             description: "Numeric values for columns",
+            accepts: "measure",
           },
           {
-            id: "rowHeaders",
-            label: "Row Headers",
+            id: "rowDimensions",
+            label: "Row Dimensions",
             description: "Dimension labels on rows",
+            accepts: "dimension",
           },
           {
-            id: "columnHeaders",
-            label: "Column Headers",
+            id: "columnDimensions",
+            label: "Column Dimensions",
             description: "Dimension labels on columns",
+            accepts: "dimension",
           },
         ]}
       />

@@ -26,34 +26,43 @@ import { FieldList } from "./FieldList";
 import { DropZone } from "./DropZone";
 import { ZoneItem } from "./DraggableItem";
 
+/**
+ * Default zone config:
+ *  Row 1 (top):    Row Dimensions   | Column Dimensions
+ *  Row 2 (bottom): Row Measures     | Column Measures
+ */
 const DEFAULT_ZONES: DropZoneConfig[] = [
+  {
+    id: "rowDimensions",
+    label: "Row Dimensions",
+    description: "Dimension labels on rows",
+    accepts: "dimension",
+  },
+  {
+    id: "columnDimensions",
+    label: "Column Dimensions",
+    description: "Dimension labels on columns",
+    accepts: "dimension",
+  },
   {
     id: "rowMeasures",
     label: "Row Measures",
     description: "Numeric values for rows",
+    accepts: "measure",
   },
   {
     id: "columnMeasures",
     label: "Column Measures",
     description: "Numeric values for columns",
-  },
-  {
-    id: "rowHeaders",
-    label: "Row Headers",
-    description: "Dimension labels on rows",
-  },
-  {
-    id: "columnHeaders",
-    label: "Column Headers",
-    description: "Dimension labels on columns",
+    accepts: "measure",
   },
 ];
 
 const DROP_ZONE_IDS: DropZoneId[] = [
   "rowMeasures",
   "columnMeasures",
-  "rowHeaders",
-  "columnHeaders",
+  "rowDimensions",
+  "columnDimensions",
 ];
 
 function isDropZoneId(id: string): id is DropZoneId {
@@ -76,17 +85,17 @@ const BOARD_H = "h-[520px] sm:h-[560px] lg:h-[580px]";
 
 export function DragDropBoard({
   listA,
-  listALabel = "Measures",
+  listALabel = "Dimensions",
   listALoading = false,
   listB,
-  listBLabel = "Dimensions",
+  listBLabel = "Measures",
   listBLoading = false,
   zones: zoneConfigs = DEFAULT_ZONES,
   initialState,
   onChange,
   className,
 }: DragDropBoardProps) {
-  const board = useDragDropBoard({ initialState, onChange });
+  const board = useDragDropBoard({ initialState, onChange, zoneConfigs });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 2 } }),
@@ -122,7 +131,7 @@ export function DragDropBoard({
           className,
         )}
       >
-        {/* ── Lists column --- */}
+        {/* ── Lists column — Dimensions first, Measures second ── */}
         <div
           className={cn(
             "flex shrink-0 gap-3",
@@ -130,29 +139,31 @@ export function DragDropBoard({
             "lg:h-full lg:w-1/2",
           )}
         >
+          {/* listA = Dimensions — click adds to rowDimensions by default */}
           <FieldList
             label={listALabel}
             sourceType="list-a"
             items={listA}
             isLoading={listALoading}
             usedFieldIds={board.usedFieldIds}
-            onItemClick={(field) => handleListItemClick(field, "rowMeasures")}
+            onItemClick={(field) => handleListItemClick(field, "rowDimensions")}
             onRegister={board.setListA}
             className="h-full min-w-0 flex-1"
           />
+          {/* listB = Measures — click adds to rowMeasures by default */}
           <FieldList
             label={listBLabel}
             sourceType="list-b"
             items={listB}
             isLoading={listBLoading}
             usedFieldIds={board.usedFieldIds}
-            onItemClick={(field) => handleListItemClick(field, "rowHeaders")}
+            onItemClick={(field) => handleListItemClick(field, "rowMeasures")}
             onRegister={board.setListB}
             className="h-full min-w-0 flex-1"
           />
         </div>
 
-        {/* ── Zones column --- */}
+        {/* ── Zones grid — top row: dimensions, bottom row: measures ── */}
         <div
           className={cn(
             "grid grid-cols-2 grid-rows-2 gap-3",
@@ -166,6 +177,7 @@ export function DragDropBoard({
               id={zoneConfig.id}
               label={zoneConfig.label}
               description={zoneConfig.description}
+              accepts={zoneConfig.accepts}
               items={board.zones[zoneConfig.id]}
               isOver={board.overZoneId === zoneConfig.id}
               onRemoveItem={(dndId) =>
@@ -177,7 +189,7 @@ export function DragDropBoard({
         </div>
       </div>
 
-      {/* Drag overlay */}
+      {/* Drag overlay — follows cursor */}
       <DndKitDragOverlay
         dropAnimation={{
           duration: 160,

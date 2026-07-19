@@ -10,11 +10,12 @@ function makeQueryClient() {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 min
         gcTime: 1000 * 60 * 10, // 10 min
-        retry: 2,
+        retry: 1,
         refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
       },
       mutations: {
-        retry: 1,
+        retry: 0,
       },
     },
   });
