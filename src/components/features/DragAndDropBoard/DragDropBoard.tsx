@@ -26,11 +26,6 @@ import { FieldList } from "./FieldList";
 import { DropZone } from "./DropZone";
 import { ZoneItem } from "./DraggableItem";
 
-/**
- * Default zone config:
- *  Row 1 (top):    Row Dimensions   | Column Dimensions
- *  Row 2 (bottom): Row Measures     | Column Measures
- */
 const DEFAULT_ZONES: DropZoneConfig[] = [
   {
     id: "rowDimensions",
@@ -114,6 +109,10 @@ export function DragDropBoard({
     [board],
   );
 
+  // Category of the item currently being dragged.
+  // null means nothing is being dragged (no zones should be disabled).
+  const activeDragCategory = board.activeField?.category ?? null;
+
   return (
     <DndContext
       sensors={sensors}
@@ -131,7 +130,7 @@ export function DragDropBoard({
           className,
         )}
       >
-        {/* ── Lists column — Dimensions first, Measures second ── */}
+        {/* ── Lists — Dimensions first (left), Measures second (right) ── */}
         <div
           className={cn(
             "flex shrink-0 gap-3",
@@ -163,7 +162,7 @@ export function DragDropBoard({
           />
         </div>
 
-        {/* ── Zones grid — top row: dimensions, bottom row: measures ── */}
+        {/* ── Drop zones grid ── */}
         <div
           className={cn(
             "grid grid-cols-2 grid-rows-2 gap-3",
@@ -171,25 +170,34 @@ export function DragDropBoard({
             "lg:h-full lg:w-1/2",
           )}
         >
-          {zoneConfigs.map((zoneConfig) => (
-            <DropZone
-              key={zoneConfig.id}
-              id={zoneConfig.id}
-              label={zoneConfig.label}
-              description={zoneConfig.description}
-              accepts={zoneConfig.accepts}
-              items={board.zones[zoneConfig.id]}
-              isOver={board.overZoneId === zoneConfig.id}
-              onRemoveItem={(dndId) =>
-                board.removeFromZone(dndId, zoneConfig.id)
-              }
-              onClear={() => board.clearZone(zoneConfig.id)}
-            />
-          ))}
+          {zoneConfigs.map((zoneConfig) => {
+            // Zone is disabled when an incompatible item is being dragged.
+            // If nothing is being dragged, no zone is disabled.
+            const isDisabled =
+              activeDragCategory !== null &&
+              activeDragCategory !== zoneConfig.accepts;
+
+            return (
+              <DropZone
+                key={zoneConfig.id}
+                id={zoneConfig.id}
+                label={zoneConfig.label}
+                description={zoneConfig.description}
+                accepts={zoneConfig.accepts}
+                items={board.zones[zoneConfig.id]}
+                isOver={!isDisabled && board.overZoneId === zoneConfig.id}
+                isDisabled={isDisabled}
+                onRemoveItem={(dndId) =>
+                  board.removeFromZone(dndId, zoneConfig.id)
+                }
+                onClear={() => board.clearZone(zoneConfig.id)}
+              />
+            );
+          })}
         </div>
       </div>
 
-      {/* Drag overlay — follows cursor */}
+      {/* Drag overlay */}
       <DndKitDragOverlay
         dropAnimation={{
           duration: 160,
